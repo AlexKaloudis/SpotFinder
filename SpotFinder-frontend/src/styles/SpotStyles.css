@@ -1,0 +1,19 @@
+.wrapper{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* This will create 3 columns of equal width */
+    grid-auto-rows: 150px;
+    grid-gap: 10px;
+    padding: 10px;
+}
+
+.mini-wrapper{
+    /* background-color: rgba(255, 255, 255, 0.8); */
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+    font-size: 15px;
+    border: solid 1px;
+    border-radius: 5px;
+    background: rgb(2,0,36);
+    background: linear-gradient(278deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 50%, rgba(0,212,255,1) 100%);
+}

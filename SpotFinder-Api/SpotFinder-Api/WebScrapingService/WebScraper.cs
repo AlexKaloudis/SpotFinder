@@ -76,10 +76,15 @@ namespace SpotFinder_Api.WebScrapingService
                 var scopedProcessingService =
                     scope.ServiceProvider
                         .GetRequiredService<SpotsService>();//here the webscraping data will be stored to the database
-                List<Spot> storedSpots = await scopedProcessingService.GetAsync();
-                List<Spot> newItems = spots.Except(storedSpots, new SpotTitleComparer()).ToList();
+                                                            // Get the titles of the new items
+                HashSet<string> newSpotTitles = new HashSet<string>(spots.Select(s => s.Title));
+                List<Spot> existingSpots = await scopedProcessingService.GetSpotsByTitlesAsync(newSpotTitles);
+                HashSet<string> existingSpotTitles = new HashSet<string>(existingSpots.Select(s => s.Title));
+                newSpotTitles.ExceptWith(existingSpotTitles);
+                List<Spot> spotsToStore = spots.Where(s => newSpotTitles.Contains(s.Title)).ToList();
 
-                if(newItems.Any()) await scopedProcessingService.CreateManyAsync(newItems);
+                // Store the new items in the database
+                await scopedProcessingService.CreateManyAsync(spotsToStore);
             }
         }
 

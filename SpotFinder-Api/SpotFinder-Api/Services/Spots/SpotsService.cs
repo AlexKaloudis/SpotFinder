@@ -27,6 +27,13 @@ namespace SpotFinder_Api.Services.Spots
         public async Task<List<Spot>> SearchLocation(string location) =>
            await _spotsCollection.Find( x => x.Location == location).ToListAsync();
 
+        public async Task<List<Spot>> GetSpotsByTitlesAsync(HashSet<string> titles)
+        {
+            var filter = Builders<Spot>.Filter.In(x => x.Title, titles);
+            return await _spotsCollection.Find(filter).ToListAsync();
+        }
+
+
         public async Task<Spot?> GetAsync(string id) =>
             await _spotsCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
 

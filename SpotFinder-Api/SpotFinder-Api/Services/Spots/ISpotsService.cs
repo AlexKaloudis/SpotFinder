@@ -9,6 +9,7 @@ namespace SpotFinder_Api.Services.Spots
         public Task<Spot?> GetAsync(string id);
 
         public Task<List<Spot>> SearchLocation(string location);
+        public Task<List<Spot>> GetSpotsByTitlesAsync(HashSet<string> titles);
 
         public Task CreateAsync(Spot newSpot);
 

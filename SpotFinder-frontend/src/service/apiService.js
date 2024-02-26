@@ -6,8 +6,9 @@ const apiService = axios.create({
   baseURL: API_BASE_URL,
 });
 
-export const fetchSomeData = async () => {
-    const response = await apiService.get('/Spots');
+export const fetchSomeData = async (pageIndex,pageSize) => {
+    const response = await apiService.get(`/Spots?pageIndex=${pageIndex}&pageSize=${pageSize}`);
+    // console.log(`pageIndex: ${pageIndex}, pageSize: ${pageSize}, totalCount: ${response.data.totalCount}`);
     return response.data;
 }
 

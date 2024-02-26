@@ -1,12 +1,11 @@
 ﻿using SpotFinder_Api.Models;
+using SpotFinder_Api.Pagination;
 
 namespace SpotFinder_Api.Services.Spots
 {
     public interface ISpotsService
     {
-        public Task<List<Spot>> GetAsync();
-
-        public Task<Spot?> GetAsync(string id);
+        public Task<PagedResult<Spot>> GetAsync(Page page);
 
         public Task<List<Spot>> SearchLocation(string location);
         public Task<List<Spot>> GetSpotsByTitlesAsync(HashSet<string> titles);

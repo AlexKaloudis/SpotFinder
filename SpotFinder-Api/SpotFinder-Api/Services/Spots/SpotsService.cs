@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using SpotFinder_Api.Models;
+using SpotFinder_Api.Pagination;
 
 namespace SpotFinder_Api.Services.Spots
 {
@@ -21,8 +23,16 @@ namespace SpotFinder_Api.Services.Spots
                 "Spots");
         }
 
-        public async Task<List<Spot>> GetAsync() =>
-            await _spotsCollection.Find(_ => true).ToListAsync();
+        public async Task<PagedResult<Spot>> GetAsync(Page page)
+        {
+            var totalCount = await _spotsCollection.CountDocumentsAsync(new BsonDocument());
+            var items = await _spotsCollection.Find(spot => true)
+                                              .Skip(page.PageIndex * page.PageSize)
+                                              .Limit(page.PageSize)
+                                              .ToListAsync();
+            return new PagedResult<Spot> { Items = items, TotalCount = (int)totalCount };
+        }
+
 
         public async Task<List<Spot>> SearchLocation(string location) =>
            await _spotsCollection.Find( x => x.Location == location).ToListAsync();

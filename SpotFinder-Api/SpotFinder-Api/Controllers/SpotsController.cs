@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SpotFinder_Api.Models;
+using SpotFinder_Api.Pagination;
 using SpotFinder_Api.Services.Spots;
 
 namespace SpotFinder_Api.Controllers
@@ -17,7 +17,17 @@ namespace SpotFinder_Api.Controllers
         }
 
         [HttpGet]
-        public async Task<List<Spot>> Get() => await _spotsService.GetAsync();
+        public async Task<ActionResult<PagedResult<Spot>>> Get([FromQuery] Page page)
+        {
+            var spots = await _spotsService.GetAsync(page);
+            if (spots == null || !spots.Items.Any())
+            {
+                return NotFound();
+            }
+            return spots;
+        }
+
+
 
         [HttpGet("{id:length(24)}")]
         public async Task<ActionResult<Spot>> Get(string id)

@@ -93,7 +93,7 @@ export default function NavbarDefault() {
           </NavLink>
         </Typography>
         <div className="hidden lg:block">{navList}</div>
-        <div className="flex items-center gap-x-1">
+        {/* <div className="flex items-center gap-x-1">
           <Button variant="text" size="sm" className="hidden lg:inline-block">
             <span>Log In</span>
           </Button>
@@ -104,7 +104,7 @@ export default function NavbarDefault() {
           >
             <span>Sign in</span>
           </Button>
-        </div>
+        </div> */}
         <IconButton
           variant="text"
           className="ml-auto h-6 w-6 text-inherit hover:bg-transparent focus:bg-transparent active:bg-transparent lg:hidden"
@@ -146,14 +146,14 @@ export default function NavbarDefault() {
       <Collapse open={openNav}>
         <div className="container mx-auto">
           {navList}
-          <div className="flex items-center gap-x-1">
+          {/* <div className="flex items-center gap-x-1">
             <Button fullWidth variant="text" size="sm" className="">
               <span>Log In</span>
             </Button>
             <Button fullWidth variant="gradient" size="sm" className="">
               <span>Sign in</span>
             </Button>
-          </div>
+          </div> */}
         </div>
       </Collapse>
     </Navbar>

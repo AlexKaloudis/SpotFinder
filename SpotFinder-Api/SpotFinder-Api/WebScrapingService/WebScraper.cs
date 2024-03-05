@@ -1,9 +1,9 @@
-﻿//using HtmlAgilityPack;
-using OpenQA.Selenium.Chrome;
+﻿using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium;
 using SpotFinder_Api.Models;
-using SpotFinder_Api.Services.Spots;
 using System.Text;
+using SpotFinder_Api.Caching;
+using SpotFinder_Api.Repositories.Spots;
 
 namespace SpotFinder_Api.WebScrapingService
 {
@@ -42,7 +42,7 @@ namespace SpotFinder_Api.WebScrapingService
 
             // visiting the target web page 
             _driver.Navigate().GoToUrl("https://www.eventbrite.com/d/greece--%CE%B8%CE%B5%CF%83%CF%83%CE%B1%CE%BB%CE%BF%CE%BD%CE%B9%CE%BA%CE%B7/tech/"); 
-            List<IWebElement> elements = _driver.FindElements(By.CssSelector("li.search-main-content__events-list-item.search-main-content__events-list-item__mobile")).ToList();
+            List<IWebElement> elements = _driver.FindElements(By.ClassName("SearchResultPanelContentEventCard-module__card___1ZDLF")).ToList();
             List<Spot> spotData = new List<Spot>();
 
             //2. throw them into a list or concurrentbag
@@ -63,28 +63,31 @@ namespace SpotFinder_Api.WebScrapingService
             }
 
             //3. store them into database in bulk
-            if (spotData.Any()) await StoreScrapingData(spotData);
+            if (spotData.Any()) await StoreScrapingData(spotData, stoppingToken);
         }
 
-        private async Task StoreScrapingData(List<Spot> spots)
+        private async Task StoreScrapingData(List<Spot> spots, CancellationToken ct)
         {
             _logger.LogInformation(
                 "Storage of scraping data is working");
 
             using (var scope = _services.CreateScope())
             {
-                var scopedProcessingService =
+                var postgresRepo =
                     scope.ServiceProvider
-                        .GetRequiredService<SpotsService>();//here the webscraping data will be stored to the database
-                                                            // Get the titles of the new items
-                HashSet<string> newSpotTitles = new HashSet<string>(spots.Select(s => s.Title));
-                List<Spot> existingSpots = await scopedProcessingService.GetSpotsByTitlesAsync(newSpotTitles);
-                HashSet<string> existingSpotTitles = new HashSet<string>(existingSpots.Select(s => s.Title));
-                newSpotTitles.ExceptWith(existingSpotTitles);
-                List<Spot> spotsToStore = spots.Where(s => newSpotTitles.Contains(s.Title)).ToList();
+                        .GetRequiredService<ISpotsRepository>();//here the webscraping data will be stored to the database
+                                                                // Get the titles of the new items
+                                                                //HashSet<string> newSpotTitles = new HashSet<string>(spots.Select(s => s.Title));
+                                                                //List<Spot> existingSpots = await postgresRepo.GetSpotsByTitlesAsync(newSpotTitles);
+                                                                //HashSet<string> existingSpotTitles = new HashSet<string>(existingSpots.Select(s => s.Title));
+                                                                //newSpotTitles.ExceptWith(existingSpotTitles);
 
-                // Store the new items in the database
-                await scopedProcessingService.CreateManyAsync(spotsToStore);
+                //List<Spot> spotsToStore = spots.Where(s => newSpotTitles.Contains(s.Title)).ToList();
+                List<Spot> spotsToStore = spots;
+                //var redis = scope.ServiceProvider.GetRequiredService<RedisOutputCacheStore>();
+                //await redis.EvictByTagAsync("spots");//evict the cache when the database is updated
+                
+                await postgresRepo.CreateManyAsync(spotsToStore);// Store the new items in the database
             }
         }
 
@@ -94,6 +97,14 @@ namespace SpotFinder_Api.WebScrapingService
             string utf8String = Encoding.UTF8.GetString(bytes);
             return utf8String;
         }
+
+        //public static List<Spot> DeDuplicate(List<Spot> existingSpots,  )
+        //{
+        //    HashSet<string> existingSpotTitles = new HashSet<string>(existingSpots.Select(s => s.Title));
+        //    newSpotTitles.ExceptWith(existingSpotTitles);
+        //    List<Spot> spotsToStore = spots.Where(s => newSpotTitles.Contains(s.Title)).ToList();
+        //    return spots.Where(s => newSpotTitles.Contains(s.Title)).ToList()
+        //}
 
         public override async Task StopAsync(CancellationToken stoppingToken)
         {

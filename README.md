@@ -1,6 +1,6 @@
 # SpotFinder
 
-SpotFinder is a project designed to fetch tech event data from event sharing platforms like Eventbrite using Selenium WebDriver. It then stores this data in a MongoDB database, making the event information readily available for users. The project also features a frontend built with React.js, showcasing the developer's profile and the project's purpose, alongside links to follow using the data from the MongoDB database. Furthermore the project uses Redis output caching to be more efficient and have faster responses.
+SpotFinder is a project designed to fetch tech event data from event sharing platforms like Eventbrite using Selenium WebDriver. It then stores this data in a Postgres database, making the event information readily available for users. The project also features a frontend built with React.js, showcasing the developer's profile and the project's purpose, alongside links to follow using the data from the Postgres database. Furthermore the project uses Redis output caching to be more efficient and have faster responses.
 
 ## Table of Contents
 
@@ -29,7 +29,7 @@ SpotFinder is designed to help users find tech events in specific areas. Current
 ## Features
 
 - Fetch tech event data from Eventbrite using Selenium WebDriver.
-- Store event data in a MongoDB database.
+- Store event data in a Postgres database.
 - React.js frontend with developer profile information and project details.
 - Links to follow for more event information.
 
